@@ -83,7 +83,7 @@ async function run() {
     app.get("/rooms", async (req, res) => {
       const category = req.query.category;
       let query = {};
-      if (category && category !== 'null') query.category = category;
+      if (category && category !== "null") query.category = category;
       const result = await roomCollection.find(query).toArray();
       res.send(result);
     });
@@ -91,6 +91,26 @@ async function run() {
     app.get("/room/:id", async (req, res) => {
       const id = req.params.id;
       const result = await roomCollection.findOne({ _id: new ObjectId(id) });
+      res.send(result);
+    });
+
+    app.post("/rooms", async (req, res) => {
+      const room = req.body;
+      const result = await roomCollection.insertOne(room);
+      res.send(result);
+    });
+
+    app.get("/myListing", async (req, res) => {
+      const email = req.query.email;
+      const query = { "host.email": email };
+      const result = await roomCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.delete("/rooms/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await roomCollection.deleteOne(query);
       res.send(result);
     });
 

@@ -15,8 +15,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <RouterProvider router={router} />
-        <Toaster />
+        <HelmetProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </HelmetProvider>
       </AuthProvider>
     </QueryClientProvider>
   </HelmetProvider>
