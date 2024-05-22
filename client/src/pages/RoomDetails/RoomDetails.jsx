@@ -15,7 +15,7 @@ import LoadingSpinner from "../../components/Shared/LoadingSpinner";
 //   to: '2024-05-21T18:00:00.000Z',
 //   from: '2024-05-19T18:00:00.000Z',
 //   price: '100',
-//   guests: '2',
+//   totalGuest: '2',
 //   bathrooms: '1',
 //   bedrooms: '1',
 //   host: {
@@ -93,7 +93,7 @@ const RoomDetails = () => {
                 text-neutral-500
               "
                 >
-                  <div>{room?.guests} guests</div>
+                  <div>{room?.totalGuest} guests</div>
                   <div>{room?.bedrooms} rooms</div>
                   <div>{room?.bathrooms} bathrooms</div>
                 </div>

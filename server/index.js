@@ -3,7 +3,12 @@ const app = express();
 require("dotenv").config();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const {
+  MongoClient,
+  ServerApiVersion,
+  ObjectId,
+  Timestamp,
+} = require("mongodb");
 const jwt = require("jsonwebtoken");
 
 const port = process.env.PORT || 5000;
@@ -48,6 +53,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const roomCollection = client.db("stayVistaDB").collection("rooms");
+    const userCollection = client.db("stayVistaDB").collection("users");
 
     // auth related api
     app.post("/jwt", async (req, res) => {
@@ -111,6 +117,33 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await roomCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.put("/users", async (req, res) => {
+      const user = req.body;
+      let query = { email: user?.email };
+      const isExist = await userCollection.findOne(query);
+      if (isExist) {
+        if (user.status === "Requested") {
+          // check if user already exists in db and try to become host
+          const result = await userCollection.updateOne(query, {
+            $set: { status: user?.status },
+          });
+          return res.send(result);
+        } else {
+          // if existing user login again
+          return res.send("Already Exist in DB");
+        }
+      }
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          ...user,
+          timestamp: Date.now(),
+        },
+      };
+      const result = await userCollection.updateOne(query, updateDoc, options);
       res.send(result);
     });
 

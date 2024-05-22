@@ -84,7 +84,7 @@ const AddRoomForm = () => {
         host: {
           name: user?.displayName,
           email: user?.email,
-          photo: user?.photoURL,
+          image: user?.photoURL,
         },
       };
       await mutateAsync(roomInfo);

@@ -5,10 +5,56 @@ import { Link } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 import avatarImg from "../../../assets/images/placeholder.jpg";
 import toast from "react-hot-toast";
+import Swal from "sweetalert2";
+import { useMutation } from "@tanstack/react-query";
+import useAxiosCommon from "../../../hooks/useAxiosCommon";
 
 const Navbar = () => {
   const { user, logOut } = useAuth();
+  const axiosCommon = useAxiosCommon();
   const [isOpen, setIsOpen] = useState(false);
+
+  const { mutateAsync } = useMutation({
+    mutationFn: async (userInfo) => {
+      const { data } = await axiosCommon.put("/users", userInfo);
+      console.log(data)
+      if(data.modifiedCount > 0){
+        Swal.fire({
+          title: "Wait for Admin Confirmation!",
+          text: "Your Request has been Sent.",
+          icon: "success",
+        });
+      } else{
+        toast.success("Please Wait for Admin Approval");
+      }
+      return data;
+    },
+  });
+
+  const beHost = async () => {
+    Swal.fire({
+      title: "Wanna become a Host?",
+      text: "Press Yes to go Further!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Next Step!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const userInfo = {
+            email: user?.email,
+            role: "Guest",
+            status: "Requested",
+          };
+          await mutateAsync(userInfo);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    });
+  };
 
   return (
     <div className="fixed w-full bg-white z-10 shadow-sm">
@@ -30,8 +76,9 @@ const Navbar = () => {
               <div className="flex flex-row items-center gap-3">
                 {/* Become A Host btn */}
                 <div className="hidden md:block">
-                  {!user && (
+                  {user && (
                     <button
+                      onClick={beHost}
                       disabled={!user}
                       className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
                     >
