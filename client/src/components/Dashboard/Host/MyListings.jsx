@@ -5,9 +5,11 @@ import useAuth from "../../../hooks/useAuth";
 import RoomDataRow from "../RoomDataRow";
 import LoadingSpinner from "../../Shared/LoadingSpinner";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const MyListings = () => {
   const axiosCommon = useAxiosCommon();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const {
     data: myListing,
@@ -48,6 +50,9 @@ const MyListings = () => {
         refetch();
       }
     });
+  };
+  const handleUpdate = (id) => {
+    navigate(`/dashboard/my-listings/updateRoom/${id}`);
   };
   if (isLoading) return <LoadingSpinner />;
   return (
@@ -113,6 +118,7 @@ const MyListings = () => {
                     <RoomDataRow
                       room={room}
                       handleDelete={handleDelete}
+                      handleUpdate={handleUpdate}
                       key={room._id}
                     ></RoomDataRow>
                   ))}

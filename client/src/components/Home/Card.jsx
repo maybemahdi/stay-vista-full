@@ -3,8 +3,9 @@ import PropTypes from "prop-types";
 import { differenceInCalendarDays } from "date-fns";
 
 const Card = ({ room }) => {
-  const totalNight =
-  parseInt(differenceInCalendarDays(new Date(room.to), new Date(room.from)));
+  const totalNight = parseInt(
+    differenceInCalendarDays(new Date(room.to), new Date(room.from))
+  );
   return (
     <Link to={`/room/${room?._id}`} className="col-span-1 cursor-pointer group">
       <div className="flex flex-col gap-2 w-full">

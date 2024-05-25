@@ -11,6 +11,8 @@ import AddRoomForm from "../components/Form/AddRoomForm";
 import Statistics from "../components/Dashboard/Common/Statistics";
 import AddRoom from "../components/Dashboard/Host/AddRoom";
 import MyListings from "../components/Dashboard/Host/MyListings";
+import UpdateRoom from "../components/Dashboard/Host/UpdateRoom";
+import ManageUsers from "../components/Dashboard/Admin/ManageUsers";
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +52,7 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      // host routes
       {
         path: "add-room",
         element: (
@@ -63,6 +66,23 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <MyListings/>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "my-listings/updateRoom/:id",
+        element: (
+          <PrivateRoute>
+            <UpdateRoom/>
+          </PrivateRoute>
+        ),
+      },
+      // admin routes
+      {
+        path: "manage-users",
+        element: (
+          <PrivateRoute>
+            <ManageUsers/>
           </PrivateRoute>
         ),
       },

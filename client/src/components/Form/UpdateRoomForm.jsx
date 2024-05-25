@@ -1,22 +1,19 @@
-import { DateRange } from "react-date-range";
-import { categories } from "../Categories/CategoriesData";
-import "react-date-range/dist/styles.css"; // main style file
-import "react-date-range/dist/theme/default.css"; // theme css file
-import { useState } from "react";
-import { FaVestPatches } from "react-icons/fa";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
-import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
-import toast from "react-hot-toast";
-import useRefetch from "../../hooks/useRefetch";
-import useAuth from "../../hooks/useAuth";
+import LoadingSpinner from "../Shared/LoadingSpinner";
+import { DateRange } from "react-date-range";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const AddRoomForm = () => {
-  const [preview, setPreview] = useState(null);
+import useAuth from "../../hooks/useAuth";
+import toast from "react-hot-toast";
+import { categories } from "../Categories/CategoriesData";
+import axios from "axios";
+
+const UpdateRoomForm = ({ id }) => {
   const axiosCommon = useAxiosCommon();
+  const [preview, setPreview] = useState(null);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { refetch } = useRefetch();
   const [state, setState] = useState([
     {
       startDate: new Date(),
@@ -24,15 +21,26 @@ const AddRoomForm = () => {
       key: "selection",
     },
   ]);
+  const {
+    data: selectedRoom,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ["updateRoom", id],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get(`/myListing/${id}`);
+      return data;
+    },
+  });
   const { mutateAsync } = useMutation({
     mutationFn: async (roomInfo) => {
-      const { data } = await axiosCommon.post("/rooms", roomInfo);
+      const { data } = await axiosCommon.patch(`/rooms/${id}`, roomInfo);
       console.log(data);
       return data;
     },
     onSuccess: () => {
       refetch();
-      toast.success("Room added to your listing");
+      toast.success("Room Updated to your listing");
     },
     onError: (error) => {
       console.log(error);
@@ -77,7 +85,7 @@ const AddRoomForm = () => {
         from: startDate,
         to: endDate,
         title,
-        image: preview,
+        image: preview || selectedRoom.image,
         price,
         totalGuest,
         bedrooms,
@@ -94,12 +102,13 @@ const AddRoomForm = () => {
       setPreview(null);
       refetch();
       navigate("/dashboard/my-listings");
-      //   toast.success("Room added to your listing");
+      //   toast.success("Room updated to your listing");
     } catch (err) {
       console.log(err);
       //   toast.error(err.message);
     }
   };
+  if (isLoading) return <LoadingSpinner />;
   return (
     <div className="w-full min-h-[calc(100vh-40px)] flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50">
       <form onSubmit={handleSubmit}>
@@ -112,6 +121,7 @@ const AddRoomForm = () => {
               <input
                 className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
                 name="location"
+                defaultValue={selectedRoom?.location}
                 id="location"
                 type="text"
                 placeholder="Location"
@@ -125,6 +135,7 @@ const AddRoomForm = () => {
               </label>
               <select
                 required
+                defaultValue={selectedRoom?.category}
                 className="w-full px-4 py-3 border border-rose-300 focus:outline-rose-500 rounded-md"
                 name="category"
               >
@@ -159,6 +170,7 @@ const AddRoomForm = () => {
               <input
                 className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
                 name="title"
+                defaultValue={selectedRoom?.title}
                 id="title"
                 type="text"
                 placeholder="Title"
@@ -201,6 +213,7 @@ const AddRoomForm = () => {
                 <input
                   className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
                   name="price"
+                  defaultValue={selectedRoom?.price}
                   id="price"
                   type="number"
                   placeholder="Price"
@@ -215,6 +228,7 @@ const AddRoomForm = () => {
                 <input
                   className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
                   name="total_guest"
+                  defaultValue={selectedRoom?.totalGuest}
                   id="guest"
                   type="number"
                   placeholder="Total guest"
@@ -232,6 +246,7 @@ const AddRoomForm = () => {
                   className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
                   name="bedrooms"
                   id="bedrooms"
+                  defaultValue={selectedRoom?.bedrooms}
                   type="number"
                   placeholder="Bedrooms"
                   required
@@ -246,6 +261,7 @@ const AddRoomForm = () => {
                   className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
                   name="bathrooms"
                   id="bathrooms"
+                  defaultValue={selectedRoom?.bathrooms}
                   type="number"
                   placeholder="Bathrooms"
                   required
@@ -260,6 +276,7 @@ const AddRoomForm = () => {
 
               <textarea
                 id="description"
+                defaultValue={selectedRoom?.description}
                 className="block rounded-md focus:rose-300 w-full h-32 px-4 py-3 text-gray-800  border border-rose-300 focus:outline-rose-500 "
                 name="description"
               ></textarea>
@@ -271,11 +288,11 @@ const AddRoomForm = () => {
           type="submit"
           className="w-full p-3 mt-5 text-center font-medium text-white transition duration-200 rounded shadow-md bg-rose-500"
         >
-          Save & Continue
+          Update & Continue
         </button>
       </form>
     </div>
   );
 };
 
-export default AddRoomForm;
+export default UpdateRoomForm;

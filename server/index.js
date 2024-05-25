@@ -106,10 +106,30 @@ async function run() {
       res.send(result);
     });
 
+    app.patch("/rooms/:id", async (req, res) => {
+      const id = req.params.id;
+      const roomInfo = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          ...roomInfo,
+        },
+      };
+      const result = await roomCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
     app.get("/myListing", async (req, res) => {
       const email = req.query.email;
       const query = { "host.email": email };
       const result = await roomCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/myListing/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await roomCollection.findOne(query);
       res.send(result);
     });
 
@@ -144,6 +164,35 @@ async function run() {
         },
       };
       const result = await userCollection.updateOne(query, updateDoc, options);
+      res.send(result);
+    });
+
+    //get user role
+    app.get("/role/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    });
+
+    //get all users for admin to manage them
+    app.get("/allUsers", async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
+
+    //update user role
+    app.patch("/users/update/:email", async (req, res) => {
+      const email = req.params.email;
+      const info = req.body;
+      const filter = { email };
+      const updateDoc = {
+        $set: {
+          role: info.role,
+          status: info.status,
+        },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
 
