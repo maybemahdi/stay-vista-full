@@ -8,10 +8,12 @@ import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import { categories } from "../Categories/CategoriesData";
 import axios from "axios";
+import { ImSpinner9 } from "react-icons/im";
 
 const UpdateRoomForm = ({ id }) => {
   const axiosCommon = useAxiosCommon();
   const [preview, setPreview] = useState(null);
+  const [imgLoading, setImgLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const [state, setState] = useState([
@@ -53,15 +55,18 @@ const UpdateRoomForm = ({ id }) => {
     const formData = new FormData();
     formData.append("image", image);
     try {
+      setImgLoading(true);
       const { data } = await axios.post(
         `https://api.imgbb.com/1/upload?key=${
           import.meta.env.VITE_IMGBB_API_KEY
         }`,
         formData
       );
+      setImgLoading(false);
       setPreview(data.data.display_url);
     } catch (error) {
       console.log(error);
+      setImgLoading(false);
     }
   };
   const handleSubmit = async (e) => {
@@ -85,7 +90,7 @@ const UpdateRoomForm = ({ id }) => {
         from: startDate,
         to: endDate,
         title,
-        image: preview || selectedRoom.image,
+        image: preview || selectedRoom?.image,
         price,
         totalGuest,
         bedrooms,
@@ -182,16 +187,23 @@ const UpdateRoomForm = ({ id }) => {
               <div className="file_upload px-5 py-3 relative border-4 border-dotted border-gray-300 rounded-lg">
                 <div className="flex flex-col items-center w-max mx-auto text-center">
                   <label>
-                    <input
-                      className="text-sm cursor-pointer w-36 hidden"
-                      type="file"
-                      name="image"
-                      onChange={handleImage}
-                      id="image"
-                      accept="image/*"
-                      hidden
-                    />
-                    <div className="bg-rose-500 text-white border border-gray-300 rounded font-semibold cursor-pointer p-1 px-3 hover:bg-rose-500">
+                    {imgLoading ? (
+                      <ImSpinner9 className="animate-spin m-auto" size={24} />
+                    ) : (
+                      <input
+                        className="text-sm cursor-pointer w-36 hidden"
+                        type="file"
+                        name="image"
+                        onChange={handleImage}
+                        id="image"
+                        accept="image/*"
+                        hidden
+                      />
+                    )}
+                    <div
+                      disabled={imgLoading}
+                      className={`${imgLoading && "bg-rose-200 cursor-not-allowed"} bg-rose-500 text-white border border-gray-300 rounded font-semibold cursor-pointer p-1 px-3 hover:bg-rose-500`}
+                    >
                       Upload Image
                     </div>
                     {preview && (
