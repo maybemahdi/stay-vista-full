@@ -15,6 +15,7 @@ import UpdateRoom from "../components/Dashboard/Host/UpdateRoom";
 import ManageUsers from "../components/Dashboard/Admin/ManageUsers";
 import Profile from "../components/Dashboard/Common/Profile";
 import MyBookings from "../components/Dashboard/Guest/MyBookings";
+import ManageBookings from "../components/Dashboard/Admin/ManageBookings";
 
 export const router = createBrowserRouter([
   {
@@ -96,6 +97,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <ManageUsers />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "manage-bookings",
+        element: (
+          <PrivateRoute>
+            <ManageBookings />
           </PrivateRoute>
         ),
       },

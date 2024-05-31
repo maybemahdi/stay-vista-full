@@ -3,12 +3,7 @@ const app = express();
 require("dotenv").config();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const {
-  MongoClient,
-  ServerApiVersion,
-  ObjectId,
-  Timestamp,
-} = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
 
 const port = process.env.PORT || 5000;
@@ -327,7 +322,13 @@ async function run() {
       res.send(result);
     });
 
-    // cancel reservetion
+    //get all booking for managing by admin
+    app.get("/allBookings", async (req, res) => {
+      const result = await bookingCollection.find().toArray();
+      res.send(result);
+    });
+
+    // cancel reservation
     app.delete("/booking/delete/:id", verifyToken, async (req, res) => {
       const id = req?.params?.id;
       const query = { _id: new ObjectId(id) };

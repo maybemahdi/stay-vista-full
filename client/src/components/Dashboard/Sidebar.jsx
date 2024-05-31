@@ -4,6 +4,7 @@ import { AiOutlineBars } from "react-icons/ai";
 import { GrLogout } from "react-icons/gr";
 import { Link, NavLink } from "react-router-dom";
 import { BsFillHouseAddFill, BsGraphUp } from "react-icons/bs";
+import { RiMacbookFill } from "react-icons/ri";
 import { MdHomeWork } from "react-icons/md";
 import { FcSettings } from "react-icons/fc";
 import useRole from "../../hooks/useRole";
@@ -137,7 +138,7 @@ const Sidebar = () => {
                   <span className="mx-4 font-medium">Statistics</span>
                 </NavLink>
 
-                {/* Mangae Users */}
+                {/* Manage Users */}
                 <NavLink
                   to="manage-users"
                   className={({ isActive }) =>
@@ -149,6 +150,19 @@ const Sidebar = () => {
                   <BsFillHouseAddFill className="w-5 h-5" />
 
                   <span className="mx-4 font-medium">Manage Users</span>
+                </NavLink>
+                {/* Manage Bookings */}
+                <NavLink
+                  to="manage-bookings"
+                  className={({ isActive }) =>
+                    `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
+                      isActive ? "bg-gray-300  text-gray-700" : "text-gray-600"
+                    }`
+                  }
+                >
+                  <RiMacbookFill className="w-5 h-5" />
+
+                  <span className="mx-4 font-medium">Manage Bookings</span>
                 </NavLink>
               </nav>
             )}
@@ -238,12 +252,14 @@ const Sidebar = () => {
                     <span className="mx-4 font-medium">My Bookings</span>
                   </NavLink>
                   <button
-                  disabled={role === "Host"}
-              onClick={beHost}
-              className={"disabled:cursor-not-allowed bg-slate-200 font-bold w-full px-4 py-3 rounded"}
-            >
-              Become A Host
-            </button>
+                    disabled={role === "Host"}
+                    onClick={beHost}
+                    className={
+                      "disabled:cursor-not-allowed bg-slate-200 font-bold w-full px-4 py-3 rounded"
+                    }
+                  >
+                    Become A Host
+                  </button>
                 </nav>
               )
             ) : undefined}
