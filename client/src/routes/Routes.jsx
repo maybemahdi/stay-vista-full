@@ -13,6 +13,8 @@ import AddRoom from "../components/Dashboard/Host/AddRoom";
 import MyListings from "../components/Dashboard/Host/MyListings";
 import UpdateRoom from "../components/Dashboard/Host/UpdateRoom";
 import ManageUsers from "../components/Dashboard/Admin/ManageUsers";
+import Profile from "../components/Dashboard/Common/Profile";
+import MyBookings from "../components/Dashboard/Guest/MyBookings";
 
 export const router = createBrowserRouter([
   {
@@ -52,12 +54,23 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+
+      //guest route
+      {
+        path: "myBookings",
+        element: (
+          <PrivateRoute>
+            <MyBookings />
+          </PrivateRoute>
+        ),
+      },
+
       // host routes
       {
         path: "add-room",
         element: (
           <PrivateRoute>
-            <AddRoom/>
+            <AddRoom />
           </PrivateRoute>
         ),
       },
@@ -65,7 +78,7 @@ export const router = createBrowserRouter([
         path: "my-listings",
         element: (
           <PrivateRoute>
-            <MyListings/>
+            <MyListings />
           </PrivateRoute>
         ),
       },
@@ -73,7 +86,7 @@ export const router = createBrowserRouter([
         path: "my-listings/updateRoom/:id",
         element: (
           <PrivateRoute>
-            <UpdateRoom/>
+            <UpdateRoom />
           </PrivateRoute>
         ),
       },
@@ -82,7 +95,17 @@ export const router = createBrowserRouter([
         path: "manage-users",
         element: (
           <PrivateRoute>
-            <ManageUsers/>
+            <ManageUsers />
+          </PrivateRoute>
+        ),
+      },
+
+      // profile route
+      {
+        path: "profile",
+        element: (
+          <PrivateRoute>
+            <Profile />
           </PrivateRoute>
         ),
       },

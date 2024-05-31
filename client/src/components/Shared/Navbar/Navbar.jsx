@@ -8,11 +8,13 @@ import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import { useMutation } from "@tanstack/react-query";
 import useAxiosCommon from "../../../hooks/useAxiosCommon";
+import useRole from "../../../hooks/useRole";
 
 const Navbar = () => {
   const { user, logOut } = useAuth();
   const axiosCommon = useAxiosCommon();
   const [isOpen, setIsOpen] = useState(false);
+  const {role} = useRole();
 
   const { mutateAsync } = useMutation({
     mutationFn: async (userInfo) => {
@@ -76,7 +78,7 @@ const Navbar = () => {
               <div className="flex flex-row items-center gap-3">
                 {/* Become A Host btn */}
                 <div className="hidden md:block">
-                  {user && (
+                  {user && role === "Guest" ? (
                     <button
                       onClick={beHost}
                       disabled={!user}
@@ -84,7 +86,7 @@ const Navbar = () => {
                     >
                       Host your home
                     </button>
-                  )}
+                  ) : undefined}
                 </div>
                 {/* Dropdown btn */}
                 <div

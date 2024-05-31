@@ -7,14 +7,64 @@ import { BsFillHouseAddFill, BsGraphUp } from "react-icons/bs";
 import { MdHomeWork } from "react-icons/md";
 import { FcSettings } from "react-icons/fc";
 import useRole from "../../hooks/useRole";
+import ToggleBtn from "./Host/ToggleBtn";
+import Swal from "sweetalert2";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const Sidebar = () => {
-  const { logOut } = useAuth();
+  const { user, logOut } = useAuth();
   const [isActive, setActive] = useState(false);
+  const axiosCommon = useAxiosCommon();
+  const [toggle, setToggle] = useState(true);
   const { role } = useRole();
   // Sidebar Responsive Handler
   const handleToggle = () => {
     setActive(!isActive);
+  };
+  const toggleHandler = (event) => {
+    setToggle(event.target.checked);
+  };
+  const { mutateAsync } = useMutation({
+    mutationFn: async (userInfo) => {
+      const { data } = await axiosCommon.put("/users", userInfo);
+      console.log(data);
+      if (data.modifiedCount > 0) {
+        Swal.fire({
+          title: "Wait for Admin Confirmation!",
+          text: "Your Request has been Sent.",
+          icon: "success",
+        });
+      } else {
+        toast.success("Please Wait for Admin Approval");
+      }
+      return data;
+    },
+  });
+  const beHost = async () => {
+    Swal.fire({
+      title: "Wanna become a Host?",
+      text: "Press Yes to go Further!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Next Step!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const userInfo = {
+            email: user?.email,
+            role: "Guest",
+            status: "Requested",
+          };
+          await mutateAsync(userInfo);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    });
   };
   return (
     <>
@@ -66,7 +116,9 @@ const Sidebar = () => {
           {/* Nav Items */}
           <div className="flex flex-col justify-between flex-1 mt-6">
             {/* Conditional toggle button here.. */}
-
+            {role === "Host" && (
+              <ToggleBtn toggleHandler={toggleHandler} toggle={toggle} />
+            )}
             {/*  Menu Items */}
             {role === "Admin" && (
               <nav>
@@ -96,55 +148,105 @@ const Sidebar = () => {
                 >
                   <BsFillHouseAddFill className="w-5 h-5" />
 
-                  <span className="mx-4 font-medium">Manae Users</span>
+                  <span className="mx-4 font-medium">Manage Users</span>
                 </NavLink>
               </nav>
             )}
-            {role === "Host" && (
-              <nav>
-                {/* Statistics */}
-                <NavLink
-                  to="/dashboard"
-                  end
-                  className={({ isActive }) =>
-                    `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
-                      isActive ? "bg-gray-300  text-gray-700" : "text-gray-600"
-                    }`
-                  }
-                >
-                  <BsGraphUp className="w-5 h-5" />
+            {role === "Host" ? (
+              toggle ? (
+                <nav>
+                  {/* Statistics */}
+                  <NavLink
+                    to="/dashboard"
+                    end
+                    className={({ isActive }) =>
+                      `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
+                        isActive
+                          ? "bg-gray-300  text-gray-700"
+                          : "text-gray-600"
+                      }`
+                    }
+                  >
+                    <BsGraphUp className="w-5 h-5" />
 
-                  <span className="mx-4 font-medium">Statistics</span>
-                </NavLink>
+                    <span className="mx-4 font-medium">Statistics</span>
+                  </NavLink>
 
-                {/* Add Room */}
-                <NavLink
-                  to="add-room"
-                  className={({ isActive }) =>
-                    `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
-                      isActive ? "bg-gray-300  text-gray-700" : "text-gray-600"
-                    }`
-                  }
-                >
-                  <BsFillHouseAddFill className="w-5 h-5" />
+                  {/* Add Room */}
+                  <NavLink
+                    to="add-room"
+                    className={({ isActive }) =>
+                      `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
+                        isActive
+                          ? "bg-gray-300  text-gray-700"
+                          : "text-gray-600"
+                      }`
+                    }
+                  >
+                    <BsFillHouseAddFill className="w-5 h-5" />
 
-                  <span className="mx-4 font-medium">Add Room</span>
-                </NavLink>
-                {/* My Listing */}
-                <NavLink
-                  to="my-listings"
-                  className={({ isActive }) =>
-                    `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
-                      isActive ? "bg-gray-300  text-gray-700" : "text-gray-600"
-                    }`
-                  }
-                >
-                  <MdHomeWork className="w-5 h-5" />
+                    <span className="mx-4 font-medium">Add Room</span>
+                  </NavLink>
+                  {/* My Listing */}
+                  <NavLink
+                    to="my-listings"
+                    className={({ isActive }) =>
+                      `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
+                        isActive
+                          ? "bg-gray-300  text-gray-700"
+                          : "text-gray-600"
+                      }`
+                    }
+                  >
+                    <MdHomeWork className="w-5 h-5" />
 
-                  <span className="mx-4 font-medium">My Listings</span>
-                </NavLink>
-              </nav>
-            )}
+                    <span className="mx-4 font-medium">My Listings</span>
+                  </NavLink>
+                </nav>
+              ) : (
+                <nav>
+                  {/* Statistics */}
+                  <NavLink
+                    to="/dashboard"
+                    end
+                    className={({ isActive }) =>
+                      `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
+                        isActive
+                          ? "bg-gray-300  text-gray-700"
+                          : "text-gray-600"
+                      }`
+                    }
+                  >
+                    <BsGraphUp className="w-5 h-5" />
+
+                    <span className="mx-4 font-medium">Statistics</span>
+                  </NavLink>
+
+                  {/* Add Room */}
+                  <NavLink
+                    to="myBookings"
+                    className={({ isActive }) =>
+                      `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
+                        isActive
+                          ? "bg-gray-300  text-gray-700"
+                          : "text-gray-600"
+                      }`
+                    }
+                  >
+                    <BsFillHouseAddFill className="w-5 h-5" />
+
+                    <span className="mx-4 font-medium">My Bookings</span>
+                  </NavLink>
+                  <button
+                  disabled={role === "Host"}
+              onClick={beHost}
+              className={"disabled:cursor-not-allowed bg-slate-200 font-bold w-full px-4 py-3 rounded"}
+            >
+              Become A Host
+            </button>
+                </nav>
+              )
+            ) : undefined}
             {role === "Guest" && (
               <nav>
                 {/* Statistics */}
@@ -164,7 +266,7 @@ const Sidebar = () => {
 
                 {/* Add Room */}
                 <NavLink
-                  to="add-room"
+                  to="myBookings"
                   className={({ isActive }) =>
                     `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
                       isActive ? "bg-gray-300  text-gray-700" : "text-gray-600"
@@ -173,24 +275,19 @@ const Sidebar = () => {
                 >
                   <BsFillHouseAddFill className="w-5 h-5" />
 
-                  <span className="mx-4 font-medium">Add Room</span>
-                </NavLink>
-                {/* My Listing */}
-                <NavLink
-                  to="my-listings"
-                  className={({ isActive }) =>
-                    `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
-                      isActive ? "bg-gray-300  text-gray-700" : "text-gray-600"
-                    }`
-                  }
-                >
-                  <MdHomeWork className="w-5 h-5" />
-
-                  <span className="mx-4 font-medium">My Listings</span>
+                  <span className="mx-4 font-medium">My Bookings</span>
                 </NavLink>
               </nav>
             )}
           </div>
+          {role === "Guest" && (
+            <button
+              onClick={beHost}
+              className={"bg-slate-200 font-bold w-full px-4 py-3 rounded"}
+            >
+              Become A Host
+            </button>
+          )}
         </div>
 
         <div>

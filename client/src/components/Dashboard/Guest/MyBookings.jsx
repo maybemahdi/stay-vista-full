@@ -1,65 +1,30 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
-import useAxiosCommon from "../../../hooks/useAxiosCommon";
-import useAuth from "../../../hooks/useAuth";
-import RoomDataRow from "../RoomDataRow";
-import LoadingSpinner from "../../Shared/LoadingSpinner";
-import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import BookingDataRow from "../BookingDataRow";
+import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import LoadingSpinner from "../../Shared/LoadingSpinner";
+import useAuth from "../../../hooks/useAuth";
 
-const MyListings = () => {
+const MyBookings = () => {
   const axiosSecure = useAxiosSecure();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const {
-    data: myListing,
+    data: bookings,
     refetch,
     isLoading,
   } = useQuery({
-    queryKey: ["myListing", user?.email],
+    queryKey: ["myBookings"],
     queryFn: async () => {
-      const { data } = await axiosSecure.get(`/myListing?email=${user?.email}`);
+      const { data } = await axiosSecure.get(`/myBookings`);
       return data;
     },
   });
-  const { mutateAsync } = useMutation({
-    mutationFn: async (id) => {
-      const { data } = await axiosCommon.delete(`/rooms/${id}`);
-      return data;
-    },
-    onSuccess: () => {
-      Swal.fire({
-        title: "Deleted!",
-        text: "Your Room has been deleted.",
-        icon: "success",
-      });
-    },
-  });
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete the Room!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await mutateAsync(id);
-        refetch();
-      }
-    });
-  };
-  const handleUpdate = (id) => {
-    navigate(`/dashboard/my-listings/updateRoom/${id}`);
-  };
+  console.log(bookings)
   if (isLoading) return <LoadingSpinner />;
   return (
     <>
       <Helmet>
-        <title>My Listings</title>
+        <title>My Bookings</title>
       </Helmet>
 
       <div className="container mx-auto px-4 sm:px-8">
@@ -79,7 +44,7 @@ const MyListings = () => {
                       scope="col"
                       className="px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal"
                     >
-                      Location
+                      Info
                     </th>
                     <th
                       scope="col"
@@ -103,25 +68,18 @@ const MyListings = () => {
                       scope="col"
                       className="px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal"
                     >
-                      Delete
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal"
-                    >
-                      Update
+                      Action
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Room row data */}
-                  {myListing?.map((room) => (
-                    <RoomDataRow
-                      room={room}
-                      handleDelete={handleDelete}
-                      handleUpdate={handleUpdate}
-                      key={room._id}
-                    ></RoomDataRow>
+                  {/* Table Row Data */}
+                  {bookings?.map((booking) => (
+                    <BookingDataRow
+                      key={booking?._id}
+                      booking={booking}
+                      refetch={refetch}
+                    />
                   ))}
                 </tbody>
               </table>
@@ -133,4 +91,4 @@ const MyListings = () => {
   );
 };
 
-export default MyListings;
+export default MyBookings;
