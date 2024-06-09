@@ -13,7 +13,12 @@ const nodemailer = require("nodemailer");
 
 // middleware
 const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://stay-vista-1289f.web.app",
+    "https://stay-vista-1289f.firebaseapp.com",
+  ],
   credentials: true,
   optionSuccessStatus: 200,
 };
